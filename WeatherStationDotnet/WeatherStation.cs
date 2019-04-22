@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace WeatherStationDotnet
 {
@@ -14,7 +15,7 @@ namespace WeatherStationDotnet
             sensors = new List<Sensor>();
         }
 
-        void AddSensor(string name)
+        public void AddSensor(string name)
         {
             bool err = false;
             switch (name.ToLower())
@@ -40,7 +41,7 @@ namespace WeatherStationDotnet
                 Console.WriteLine("Podczas dodawania czujnika wystąpił błąd!");
             else Console.WriteLine("Dodano czujnik!");
         }
-        void AddSensor(string name, string sensorName)
+        public void AddSensor(string name, string sensorName)
         {
             switch (name.ToLower())
             {
@@ -65,6 +66,8 @@ namespace WeatherStationDotnet
                     break;
             }
         }
+
+        public void SetUnit(char value) => unit = value;
 
         internal Func<double, bool> IsGreaterThanValue;
         internal Func<double, bool> IsLowerThanValue;
@@ -162,6 +165,41 @@ namespace WeatherStationDotnet
                     throw new Exception("Wrong switch case!");
             }
         }
+        public void SerializeData()
+        {
+            string type;
+            while (true)
+            {
+                if(sensors.Count!=0 && sensors != null)
+                {
+                    foreach(Sensor sensor in sensors)
+                    {
+                        type = (sensor.GetType().Name);
+                        switch (type)
+                        {
+                            case "TemperatureAndHumiditySensor":
+                                TemperatureAndHumiditySensor tempTAH = (TemperatureAndHumiditySensor)sensor;
+                                tempTAH.Humidity++;
+                                tempTAH.Temperature++;
+                                break;
+                            case "TemperatureSensor":
+                                TemperatureSensor tempT = (TemperatureSensor)sensor;
+                                tempT.Temperature++;
+                                break;
+                            case "HumiditySensor":
+                                HumiditySensor tempH = (HumiditySensor)sensor;
+                                tempH.Humidity++;
+                                break;
+                            case "PressureSensor":
+                                PressureSensor tempP = (PressureSensor)sensor;
+                                tempP.Pressure++;
+                                break;
 
+                        }
+                    }
+                }
+                Thread.Sleep(1000);
+            }
+        }
     }
 }

@@ -63,7 +63,7 @@ namespace WeatherStationDotnet
         public double Humidity
         {
             get { return humidity; }
-            set { humidity = Math.Round(rand.NextDouble() * 100, 2); }
+            set { humidity = Math.Round(rand.NextDouble() * 100,2);}
         }
     }
 }
