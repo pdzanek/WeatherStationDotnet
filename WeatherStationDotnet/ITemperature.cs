@@ -1,5 +1,4 @@
-﻿
-namespace WeatherStationDotnet
+﻿namespace WeatherStationDotnet
 {
     interface ITemperature
     {
