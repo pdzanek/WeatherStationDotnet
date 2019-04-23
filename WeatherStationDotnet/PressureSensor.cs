@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace WeatherStationDotnet
 {
+    [DataContract]
     class PressureSensor : Sensor, IPressure
     {
+        [DataMember(Name = "Pressure")]
         int pressure;
         Random rand;
         public PressureSensor() : base()

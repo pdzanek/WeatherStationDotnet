@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 using System.Threading;
 
 namespace WeatherStationDotnet
 {
+
     class WeatherStation
     {
         static List<Sensor> sensors;
         string Name;
-        static char unit='C';
+        static char unit = 'C';
         public WeatherStation(string WeatherStationName)
         {
             Name = WeatherStationName;
@@ -82,11 +86,11 @@ namespace WeatherStationDotnet
                     foreach (Sensor sensor in sensors)
                         if (sensor is ITemperature)
                         {
-                            ITemperature ts = sensor as ITemperature; 
+                            ITemperature ts = sensor as ITemperature;
                             if (comparsionString.Equals(">"))
                             {
                                 if (IsGreaterThanValue(ts.Temperature))
-                                    Console.WriteLine("{0}: {1} {2}",sensor.Name, ts.Temperature, ts.Unit);
+                                    Console.WriteLine("{0}: {1} {2}", sensor.Name, ts.Temperature, ts.Unit);
                             }
                             else
                             {
@@ -103,7 +107,7 @@ namespace WeatherStationDotnet
                             if (comparsionString.Equals(">"))
                             {
                                 if (IsGreaterThanValue(hs.Humidity))
-                                    Console.WriteLine("{0}: {1}%",sensor.Name, hs.Humidity);
+                                    Console.WriteLine("{0}: {1}%", sensor.Name, hs.Humidity);
                             }
                             else
                             {
@@ -168,11 +172,16 @@ namespace WeatherStationDotnet
         public void SerializeData()
         {
             string type;
+            var output = File.OpenWrite("log.json");
+
             while (true)
             {
-                if(sensors.Count!=0 && sensors != null)
+                if (sensors.Count != 0 && sensors != null)
                 {
-                    foreach(Sensor sensor in sensors)
+                    DataContractJsonSerializer dateWriter = new DataContractJsonSerializer(typeof(string));
+                    dateWriter.WriteObject(output, DateTime.Now.ToString("h:mm:ss"));
+
+                    foreach (Sensor sensor in sensors)
                     {
                         type = (sensor.GetType().Name);
                         switch (type)
@@ -194,8 +203,9 @@ namespace WeatherStationDotnet
                                 PressureSensor tempP = (PressureSensor)sensor;
                                 tempP.Pressure++;
                                 break;
-
                         }
+                        DataContractJsonSerializer writer = new DataContractJsonSerializer(sensor.GetType());
+                        writer.WriteObject(output, sensor);
                     }
                 }
                 Thread.Sleep(1000);
@@ -203,3 +213,4 @@ namespace WeatherStationDotnet
         }
     }
 }
+

@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace WeatherStationDotnet
 {
+    [DataContract]
     class HumiditySensor: Sensor, IHumidity
     {
         Random rand;
+        [DataMember(Name = "Humidity")]
         double humidity;
         public HumiditySensor() : base()
         {

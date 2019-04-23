@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace WeatherStationDotnet
 {
+    [DataContract]
     public class Sensor
     {
+        [DataMember]
         public string Name { set; get; }
         public static int instances = 0;
         public Sensor()
