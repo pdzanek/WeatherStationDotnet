@@ -18,6 +18,7 @@ namespace WeatherStationDotnet
         }
         public Sensor(string name)
         {
+            if (name.Length < 1) name = "Sensor";
             try
             {
                 if (name.Length >= 16)

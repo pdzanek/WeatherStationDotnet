@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace WeatherStationDotnet
 {
     class WeatherStation
     {
+        public bool active = false;
         private Sensor sensor;
         static List<Sensor> sensors;
-        string Name;
+        public string Name { get; set; }
         static char unit = 'C';
         public WeatherStation(string WeatherStationName)
         {
@@ -16,66 +18,57 @@ namespace WeatherStationDotnet
         }
         void eventHandlerPrinter(Measurement measurement)
         {
-            Console.WriteLine(measurement.Key + " " + measurement.Value);
+            if(active)
+            Console.WriteLine(Name+" "+measurement.Key + " " + measurement.Value);
         }
-        public void AddSensor(string name)
+
+        public void AddSensor(string type, string sensorName)
         {
-            bool err = false;
-            switch (name.ToLower())
+            switch (type.ToLower())
             {
                 case "temperature":
-                    sensor = new TemperatureSensor();
-                    sensor.MeasurementEvent += eventHandlerPrinter;
-                    Program.sensors.Add(sensor);
-                    Console.WriteLine("Dodano czujnik!");
+                    if (!CheckIfSensorExists(sensorName))
+                    {
+                        sensor = new TemperatureSensor(sensorName);
+                        Program.sensors.Add(sensor);
+                        sensor.MeasurementEvent += eventHandlerPrinter;
+                        Console.WriteLine("Dodano czujnik!");
+                    }
+                    else
+                        Console.WriteLine("Zasubskrybowano istniejący czujnik.");
                     break;
                 case "humidity":
-                    sensor = new HumiditySensor();
-                    sensor.MeasurementEvent += eventHandlerPrinter;
-                    Console.WriteLine("Dodano czujnik!");
+                    if (!CheckIfSensorExists(sensorName))
+                    {
+                        sensor = new HumiditySensor(sensorName);
+                        Program.sensors.Add(sensor);
+                        sensor.MeasurementEvent += eventHandlerPrinter;
+                        Console.WriteLine("Dodano czujnik!");
+                    }
+                    else
+                        Console.WriteLine("Zasubskrybowano istniejący czujnik.");
                     break;
                 case "pressure":
-                    sensor = new PressureSensor();
-                    sensor.MeasurementEvent += eventHandlerPrinter;
-                    Console.WriteLine("Dodano czujnik!");
+                    if (!CheckIfSensorExists(sensorName))
+                    {
+                        sensor = new PressureSensor(sensorName);
+                        Program.sensors.Add(sensor);
+                        sensor.MeasurementEvent += eventHandlerPrinter;
+                        Console.WriteLine("Dodano czujnik!");
+                    }
+                    else
+                        Console.WriteLine("Zasubskrybowano istniejący czujnik.");
                     break;
                 case "tempandhumidity":
-                    sensor = new TemperatureAndHumiditySensor();
-                    sensor.MeasurementEvent += eventHandlerPrinter;
-                    Console.WriteLine("Dodano czujnik!");
-                    break;
-                default:
-                    Console.WriteLine("Podano nieprawidłowy typ czujnika.");
-                    err = true;
-                    break;
-            }
-            if (err)
-                Console.WriteLine("Podczas dodawania czujnika wystąpił błąd!");
-            else Console.WriteLine("Dodano czujnik!");
-        }
-        public void AddSensor(string name, string sensorName)
-        {
-            switch (name.ToLower())
-            {
-                case "temperature":
-                    sensor = new TemperatureSensor(sensorName);
-                    sensor.MeasurementEvent += eventHandlerPrinter;
-                    Console.WriteLine("Dodano czujnik!");
-                    break;
-                case "humidity":
-                    sensor = new HumiditySensor(sensorName);
-                    sensor.MeasurementEvent += eventHandlerPrinter;
-                    Console.WriteLine("Dodano czujnik!");
-                    break;
-                case "pressure":
-                    sensor = new PressureSensor(sensorName);
-                    sensor.MeasurementEvent += eventHandlerPrinter;
-                    Console.WriteLine("Dodano czujnik!");
-                    break;
-                case "tempandhumidity":
-                    sensor = new TemperatureAndHumiditySensor(sensorName);
-                    sensor.MeasurementEvent += eventHandlerPrinter;
-                    Console.WriteLine("Dodano czujnik!");
+                    if (!CheckIfSensorExists(sensorName))
+                    {
+                        sensor = new TemperatureAndHumiditySensor(sensorName);
+                        Program.sensors.Add(sensor);
+                        sensor.MeasurementEvent += eventHandlerPrinter;
+                        Console.WriteLine("Dodano czujnik!");
+                    }
+                    else
+                        Console.WriteLine("Zasubskrybowano istniejący czujnik.");
                     break;
                 default:
                     Console.WriteLine("Podano nieprawidłowy typ czujnika.");
@@ -87,6 +80,9 @@ namespace WeatherStationDotnet
 
         internal Func<double, bool> IsGreaterThanValue;
         internal Func<double, bool> IsLowerThanValue;
+
+     
+
         public void GetSpecifiedData(string type, string comparsionString, double value)
         {
             IsGreaterThanValue = x => x > value;
@@ -184,13 +180,16 @@ namespace WeatherStationDotnet
         private bool CheckIfSensorExists(string name)
         {
             bool exists = false;
-            foreach (Sensor sensor in Program.sensors)
+            if (Program.sensors.Count != 0 && Program.sensors != null)
             {
-                if (name.Equals(sensor.Name))
+                foreach (Sensor sensor in Program.sensors)
                 {
-                    Console.WriteLine(sensor.Name);
-                    sensor.MeasurementEvent += eventHandlerPrinter;
-                    exists = true;
+                    if (name.Equals(sensor.Name))
+                    {
+                        Console.WriteLine(sensor.Name);
+                        sensor.MeasurementEvent += eventHandlerPrinter;
+                        exists = true;
+                    }
                 }
             }
             return exists;
