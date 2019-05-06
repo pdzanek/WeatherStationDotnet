@@ -6,6 +6,8 @@ namespace WeatherStationDotnet
     [DataContract]
     public class Sensor
     {
+        public delegate void MeasurementDelegate(Measurement measurement);
+        public event MeasurementDelegate MeasurementEvent;
         [DataMember]
         public string Name { set; get; }
         public static int instances = 0;
@@ -36,5 +38,10 @@ namespace WeatherStationDotnet
                 Console.WriteLine(e.Message);
             }
         }
+        public void Measurement(string key, double value)
+        {
+            MeasurementEvent?.Invoke(new Measurement(key, value));
+        }
     }
 }
+//TODO: 2.	Do klasy bazowej Sensor dodać zdarzenie(event) pozwalające na przekazywanie obiektu klasy Measurement.

@@ -1,14 +1,13 @@
-﻿
-namespace WeatherStationDotnet
+﻿namespace WeatherStationDotnet
 {
-    class Measurement
+    public class Measurement
     {
-        Measurement(string key, double value)
+       public Measurement(string key, double value)
         {
             Key = key;
             Value = value;
         }
-        string Key { get; set; }
-        double Value { get; set; }
+        public string Key { get; set; }
+        public double Value { get; set; }
     }
 }

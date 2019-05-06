@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Threading;
 
 namespace WeatherStationDotnet
 {
-
     class WeatherStation
     {
+        private Sensor sensor;
         static List<Sensor> sensors;
         string Name;
         static char unit = 'C';
@@ -18,13 +17,18 @@ namespace WeatherStationDotnet
             Name = WeatherStationName;
             sensors = new List<Sensor>();
         }
-
+        void eventHandlerPrinter(Measurement measurement)
+        {
+            Console.WriteLine(measurement.Key+" "+measurement.Value);
+        }
         public void AddSensor(string name)
         {
             bool err = false;
             switch (name.ToLower())
             {
                 case "temperature":
+                    sensor= new TemperatureSensor();
+                    sensor.MeasurementEvent += eventHandlerPrinter;
                     sensors.Add(new TemperatureSensor());
                     break;
                 case "humidity":

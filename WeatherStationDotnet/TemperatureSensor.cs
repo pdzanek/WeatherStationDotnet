@@ -40,6 +40,7 @@ namespace WeatherStationDotnet
                     else
                         temperature = Math.Round(-rand.Next(55) * 1.8 + 32, 2);
                 }
+                Measurement(Name+" temperature", temperature);
             }
         }
 

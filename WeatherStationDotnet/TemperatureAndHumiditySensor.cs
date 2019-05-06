@@ -45,7 +45,6 @@ namespace WeatherStationDotnet
                     if (rand.Next(1) == 0)
                     {
                         temperature = Math.Round(rand.Next(55) * 1.8 + 32, 2);
-
                     }
                     else
                     {
