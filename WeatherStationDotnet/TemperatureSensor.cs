@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace WeatherStationDotnet
 {
@@ -15,11 +16,15 @@ namespace WeatherStationDotnet
         public TemperatureSensor() : base()
         {
             rand = new Random();
+            Thread MeasureCaller = new Thread(new ThreadStart(MeasureTemperature));
+            MeasureCaller.Start();
         }
 
         public TemperatureSensor(string name) : base(name)
         {
             rand = new Random();
+            Thread MeasureCaller = new Thread(new ThreadStart(MeasureTemperature));
+            MeasureCaller.Start();
         }
         public double Temperature
         {
@@ -28,19 +33,28 @@ namespace WeatherStationDotnet
             {
                 if (unit)
                 {
-                    if (rand.Next(1) == 0)
+                    if (rand.Next(2) == 0)
                         temperature = rand.Next(55);
                     else
                         temperature = -rand.Next(55);
                 }
                 else
                 {
-                    if (rand.Next(1) == 0)
+                    if (rand.Next(2) == 0)
                         temperature = Math.Round(rand.Next(55) * 1.8 + 32, 2);
                     else
                         temperature = Math.Round(-rand.Next(55) * 1.8 + 32, 2);
                 }
-                Measurement(Name+" temperature", temperature);
+                Measurement(Name+" temperature "+Unit, temperature);
+            }
+        }
+        
+        private void MeasureTemperature()
+        {
+            while (true)
+            {
+                Temperature++;
+                Thread.Sleep(5000);
             }
         }
 

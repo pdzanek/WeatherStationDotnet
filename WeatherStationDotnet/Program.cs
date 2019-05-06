@@ -1,39 +1,21 @@
 ﻿using System;
-using System.Threading;
+using System.Collections.Generic;
 
 namespace WeatherStationDotnet
 {
     class Program
     {
+        static public List<Sensor> sensors;
         static void Main(string[] args)
         {
-            Sensor sensor = new Sensor("name");
-            Sensor sensor1 = new Sensor("name56789qwertyzxcvbnm");
-            Console.WriteLine(sensor.Name);
-            Console.WriteLine(sensor1.Name);
-            PressureSensor pressureSensor1 = new PressureSensor("PressureSensor");
-            pressureSensor1.Pressure++;
-            Console.WriteLine("{0} hPa", pressureSensor1.Pressure);
-            TemperatureSensor temperatureSensor1 = new TemperatureSensor("TemperatureSensor");
-            temperatureSensor1.Temperature++;
-            Console.WriteLine(temperatureSensor1.Name);
-            Console.WriteLine("{0} {1}",temperatureSensor1.Temperature, temperatureSensor1.Unit);
-            TemperatureAndHumiditySensor tah1 = new TemperatureAndHumiditySensor("TemperatureAndHumiditySensor");
-            tah1.Humidity++;
-            tah1.Temperature++;
-            Console.WriteLine("{0} {1}", tah1.Temperature, tah1.Unit);
-            Console.WriteLine("{0}%",tah1.Humidity);
-
-            string menuOption,opt,sensorName,sensorType,tempUnit,comparsionString;
+            string menuOption, opt, sensorName, sensorType, tempUnit, comparsionString;
             double value;
-            Console.WriteLine("\nWciśnij dowolny klawisz, aby przejść do stacji pogodowej.");
-            Console.ReadKey();
+           
             Console.Clear();
             Console.WriteLine("-----------------WEATHER STATION---------------\n");
             Sensor.instances = 0;
             WeatherStation weatherStation = new WeatherStation("Weather Station no. 1");
-            Thread SerializeCaller = new Thread(new ThreadStart(weatherStation.SerializeData));
-            SerializeCaller.Start();
+            WeatherStation weatherStation2 = new WeatherStation("Weather Station no. 2");
             while (true)
             {
                 Console.WriteLine("1. Dodaj czujnik.");
@@ -123,7 +105,6 @@ namespace WeatherStationDotnet
                         break;
                     case "4":
                         Console.Clear();
-                        Console.WriteLine("-----------------WEATHER STATION---------------\n");
                         break;
                     default:
                         Console.WriteLine("Wybrano błędną opcje");
@@ -134,3 +115,26 @@ namespace WeatherStationDotnet
         }
     }
 }
+
+
+/*Sensor sensor = new Sensor("name");
+           Sensor sensor1 = new Sensor("name56789qwertyzxcvbnm");
+           Console.WriteLine(sensor.Name);
+           Console.WriteLine(sensor1.Name);
+           PressureSensor pressureSensor1 = new PressureSensor("PressureSensor");
+           pressureSensor1.Pressure++;
+           Console.WriteLine("{0} hPa", pressureSensor1.Pressure);
+           TemperatureSensor temperatureSensor1 = new TemperatureSensor("TemperatureSensor");
+           temperatureSensor1.Temperature++;
+           Console.WriteLine(temperatureSensor1.Name);
+           Console.WriteLine("{0} {1}",temperatureSensor1.Temperature, temperatureSensor1.Unit);
+           TemperatureAndHumiditySensor tah1 = new TemperatureAndHumiditySensor("TemperatureAndHumiditySensor");
+           tah1.Humidity++;
+           tah1.Temperature++;
+           Console.WriteLine("{0} {1}", tah1.Temperature, tah1.Unit);
+           Console.WriteLine("{0}%",tah1.Humidity);
+
+
+           Console.WriteLine("\nWciśnij dowolny klawisz, aby przejść do stacji pogodowej.");
+           Console.ReadKey();
+           */

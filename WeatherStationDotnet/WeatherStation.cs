@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Json;
-using System.Threading;
 
 namespace WeatherStationDotnet
 {
@@ -19,7 +16,7 @@ namespace WeatherStationDotnet
         }
         void eventHandlerPrinter(Measurement measurement)
         {
-            Console.WriteLine(measurement.Key+" "+measurement.Value);
+            Console.WriteLine(measurement.Key + " " + measurement.Value);
         }
         public void AddSensor(string name)
         {
@@ -27,18 +24,25 @@ namespace WeatherStationDotnet
             switch (name.ToLower())
             {
                 case "temperature":
-                    sensor= new TemperatureSensor();
+                    sensor = new TemperatureSensor();
                     sensor.MeasurementEvent += eventHandlerPrinter;
-                    sensors.Add(new TemperatureSensor());
+                    Program.sensors.Add(sensor);
+                    Console.WriteLine("Dodano czujnik!");
                     break;
                 case "humidity":
-                    sensors.Add(new HumiditySensor());
+                    sensor = new HumiditySensor();
+                    sensor.MeasurementEvent += eventHandlerPrinter;
+                    Console.WriteLine("Dodano czujnik!");
                     break;
                 case "pressure":
-                    sensors.Add(new PressureSensor());
+                    sensor = new PressureSensor();
+                    sensor.MeasurementEvent += eventHandlerPrinter;
+                    Console.WriteLine("Dodano czujnik!");
                     break;
                 case "tempandhumidity":
-                    sensors.Add(new TemperatureAndHumiditySensor());
+                    sensor = new TemperatureAndHumiditySensor();
+                    sensor.MeasurementEvent += eventHandlerPrinter;
+                    Console.WriteLine("Dodano czujnik!");
                     break;
                 default:
                     Console.WriteLine("Podano nieprawidłowy typ czujnika.");
@@ -54,19 +58,23 @@ namespace WeatherStationDotnet
             switch (name.ToLower())
             {
                 case "temperature":
-                    sensors.Add(new TemperatureSensor(sensorName));
+                    sensor = new TemperatureSensor(sensorName);
+                    sensor.MeasurementEvent += eventHandlerPrinter;
                     Console.WriteLine("Dodano czujnik!");
                     break;
                 case "humidity":
-                    sensors.Add(new HumiditySensor(sensorName));
+                    sensor = new HumiditySensor(sensorName);
+                    sensor.MeasurementEvent += eventHandlerPrinter;
                     Console.WriteLine("Dodano czujnik!");
                     break;
                 case "pressure":
-                    sensors.Add(new PressureSensor(sensorName));
+                    sensor = new PressureSensor(sensorName);
+                    sensor.MeasurementEvent += eventHandlerPrinter;
                     Console.WriteLine("Dodano czujnik!");
                     break;
                 case "tempandhumidity":
-                    sensors.Add(new TemperatureAndHumiditySensor(sensorName));
+                    sensor = new TemperatureAndHumiditySensor(sensorName);
+                    sensor.MeasurementEvent += eventHandlerPrinter;
                     Console.WriteLine("Dodano czujnik!");
                     break;
                 default:
@@ -173,48 +181,64 @@ namespace WeatherStationDotnet
                     throw new Exception("Wrong switch case!");
             }
         }
-        public void SerializeData()
+        private bool CheckIfSensorExists(string name)
         {
-            string type;
-            var output = File.OpenWrite("log.json");
-
-            while (true)
+            bool exists = false;
+            foreach (Sensor sensor in Program.sensors)
             {
-                if (sensors.Count != 0 && sensors != null)
+                if (name.Equals(sensor.Name))
                 {
-                    DataContractJsonSerializer dateWriter = new DataContractJsonSerializer(typeof(string));
-                    dateWriter.WriteObject(output, DateTime.Now.ToString("h:mm:ss"));
-
-                    foreach (Sensor sensor in sensors)
-                    {
-                        type = (sensor.GetType().Name);
-                        switch (type)
-                        {
-                            case "TemperatureAndHumiditySensor":
-                                TemperatureAndHumiditySensor tempTAH = (TemperatureAndHumiditySensor)sensor;
-                                tempTAH.Humidity++;
-                                tempTAH.Temperature++;
-                                break;
-                            case "TemperatureSensor":
-                                TemperatureSensor tempT = (TemperatureSensor)sensor;
-                                tempT.Temperature++;
-                                break;
-                            case "HumiditySensor":
-                                HumiditySensor tempH = (HumiditySensor)sensor;
-                                tempH.Humidity++;
-                                break;
-                            case "PressureSensor":
-                                PressureSensor tempP = (PressureSensor)sensor;
-                                tempP.Pressure++;
-                                break;
-                        }
-                        DataContractJsonSerializer writer = new DataContractJsonSerializer(sensor.GetType());
-                        writer.WriteObject(output, sensor);
-                    }
+                    Console.WriteLine(sensor.Name);
+                    sensor.MeasurementEvent += eventHandlerPrinter;
+                    exists = true;
                 }
-                Thread.Sleep(1000);
             }
+            return exists;
         }
+
     }
 }
+        /* public void SerializeData()
+         {
+             string type;
+             var output = File.OpenWrite("log.json");
 
+             while (true)
+             {
+                 if (sensors.Count != 0 && sensors != null)
+                 {
+                     DataContractJsonSerializer dateWriter = new DataContractJsonSerializer(typeof(string));
+                     dateWriter.WriteObject(output, DateTime.Now.ToString("h:mm:ss"));
+
+                     foreach (Sensor sensor in sensors)
+                     {
+                         type = (sensor.GetType().Name);
+                         switch (type)
+                         {
+                             case "TemperatureAndHumiditySensor":
+                                 TemperatureAndHumiditySensor tempTAH = (TemperatureAndHumiditySensor)sensor;
+                                 tempTAH.Humidity++;
+                                 tempTAH.Temperature++;
+                                 break;
+                             case "TemperatureSensor":
+                                 TemperatureSensor tempT = (TemperatureSensor)sensor;
+                                 tempT.Temperature++;
+                                 break;
+                             case "HumiditySensor":
+                                 HumiditySensor tempH = (HumiditySensor)sensor;
+                                 tempH.Humidity++;
+                                 break;
+                             case "PressureSensor":
+                                 PressureSensor tempP = (PressureSensor)sensor;
+                                 tempP.Pressure++;
+                                 break;
+                         }
+                         DataContractJsonSerializer writer = new DataContractJsonSerializer(sensor.GetType());
+                         writer.WriteObject(output, sensor);
+                     }
+                 }
+                 Thread.Sleep(1000);
+             }
+         }
+     }
+     */

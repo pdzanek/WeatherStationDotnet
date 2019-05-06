@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace WeatherStationDotnet
 {
@@ -17,11 +18,15 @@ namespace WeatherStationDotnet
         public TemperatureAndHumiditySensor() : base()
         {
             rand = new Random();
+            Thread MeasureCaller = new Thread(new ThreadStart(MeasureTemperatureAndHumidity));
+            MeasureCaller.Start();
         }
 
         public TemperatureAndHumiditySensor(string name) : base(name)
         {
             rand = new Random();
+            Thread MeasureCaller = new Thread(new ThreadStart(MeasureTemperatureAndHumidity));
+            MeasureCaller.Start();
         }
 
         public double Temperature
@@ -31,7 +36,7 @@ namespace WeatherStationDotnet
             {
                 if (unit)
                 {
-                    if (rand.Next(1) == 0)
+                    if (rand.Next(2) == 0)
                     {
                         temperature = rand.Next(55);
                     }
@@ -42,7 +47,7 @@ namespace WeatherStationDotnet
                 }
                 else
                 {
-                    if (rand.Next(1) == 0)
+                    if (rand.Next(2) == 0)
                     {
                         temperature = Math.Round(rand.Next(55) * 1.8 + 32, 2);
                     }
@@ -51,6 +56,7 @@ namespace WeatherStationDotnet
                         temperature = Math.Round(-rand.Next(55) * 1.8 + 32, 2);
                     }
                 }
+                Measurement(Name + " temperature " + Unit, temperature);
             }
         }
         public char Unit
@@ -67,7 +73,20 @@ namespace WeatherStationDotnet
         public double Humidity
         {
             get { return humidity; }
-            set { humidity = Math.Round(rand.NextDouble() * 100,2);}
+            set
+            {
+                humidity = Math.Round(rand.NextDouble() * 100,2);
+                Measurement(Name + " humidity", humidity);
+            }
+        }
+        private void MeasureTemperatureAndHumidity()
+        {
+            while (true)
+            {
+                Humidity++;
+                Temperature++;
+                Thread.Sleep(5000);
+            }
         }
     }
 }
