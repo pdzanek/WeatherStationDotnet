@@ -37,7 +37,6 @@ namespace WeatherStationDotnet
                     default:
                         Console.WriteLine("Wybrano błędną opcje");
                         break;
-
                 }
                 Console.WriteLine("-----------------{0}---------------\n", currentStation.Name);
                 currentStation.active = true;
@@ -60,16 +59,16 @@ namespace WeatherStationDotnet
                             switch (opt)
                             {
                                 case "1":
-                                    Program.currentStation.AddSensor("temperature", sensorName);
+                                    currentStation.AddSensor("temperature", sensorName);
                                     break;
                                 case "2":
-                                    Program.currentStation.AddSensor("humidity", sensorName);
+                                    currentStation.AddSensor("humidity", sensorName);
                                     break;
                                 case "3":
-                                    Program.currentStation.AddSensor("pressure", sensorName);
+                                    currentStation.AddSensor("pressure", sensorName);
                                     break;
                                 case "4":
-                                    Program.currentStation.AddSensor("tempandhumidity", sensorName);
+                                    currentStation.AddSensor("tempandhumidity", sensorName);
                                     break;
                                 default:
                                     Console.WriteLine("Dokonano nieprawidłowego wyboru!");
@@ -87,11 +86,10 @@ namespace WeatherStationDotnet
                                     tempUnit = Console.ReadLine();
                                     if ((tempUnit.ToUpper()).Equals("F"))
                                     {
-                                        currentStation.SetUnit('F');
+                                        setUnit('F');
                                     }
-                                    else currentStation.SetUnit('C');
-
-                                    currentStation.GetAllDataByType('t');
+                                    else setUnit('C');
+                                    currentStation.GetAllDataByType('t', tempUnit[0]);
                                     break;
                                 case "h":
                                     currentStation.GetAllDataByType('h');
@@ -137,6 +135,17 @@ namespace WeatherStationDotnet
                             Console.WriteLine("Wybrano błędną opcje");
                             break;
 
+                    }
+                }
+            }
+            void setUnit(char unit)
+            {
+                foreach(Sensor sensor in sensors)
+                {
+                    if(sensor is ITemperature)
+                    {
+                        ITemperature cSensor = (ITemperature)sensor;
+                        cSensor.Unit = unit;
                     }
                 }
             }

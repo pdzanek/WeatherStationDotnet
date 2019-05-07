@@ -45,4 +45,3 @@ namespace WeatherStationDotnet
         }
     }
 }
-//TODO: 2.	Do klasy bazowej Sensor dodać zdarzenie(event) pozwalające na przekazywanie obiektu klasy Measurement.

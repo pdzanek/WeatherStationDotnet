@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using System.Runtime.Serialization.Json;
+using System.Threading;
 
 namespace WeatherStationDotnet
 {
@@ -8,14 +10,15 @@ namespace WeatherStationDotnet
     {
         public bool active = false;
         private Sensor sensor;
-        static List<KeyValuePair<string,double>> measurements;
-        static List<Sensor> sensors;
+        List<KeyValuePair<string,double>> measurements;
         public string Name { get; set; }
-        static char unit = 'C';
+        private static readonly char unit = 'C';
         public WeatherStation(string WeatherStationName)
         {
             Name = WeatherStationName;
-            measurements = new List<KeyValuePair<string,double>>();
+            measurements = new List<KeyValuePair<string, double>>();
+            Thread serializerThread = new Thread(SerializeData);
+            serializerThread.Start();
         }
         void eventHandlerPrinter(Measurement measurement)
         {
@@ -92,8 +95,6 @@ namespace WeatherStationDotnet
             }
         }
 
-        public void SetUnit(char value) => unit = value;
-
         internal Func<double, bool> IsGreaterThanValue;
         internal Func<double, bool> IsLowerThanValue;
 
@@ -105,73 +106,68 @@ namespace WeatherStationDotnet
             switch (type)
             {
                 case "t":
-                        foreach (Sensor sensor in sensors)
-                        if (sensor is ITemperature)
-                        {
-                            ITemperature ts = sensor as ITemperature;
-                            if (comparsionString.Equals(">"))
-                            {
-                                if (IsGreaterThanValue(ts.Temperature))
-                                    Console.WriteLine("{0}: {1} {2}", sensor.Name, ts.Temperature, ts.Unit);
-                            }
-                            else
-                            {
-                                if (IsLowerThanValue(ts.Temperature))
-                                    Console.WriteLine("{0}: {1} {2}", sensor.Name, ts.Temperature, ts.Unit);
-                            }
-                        }
-                    break;
-                case "h":
-                    foreach (Sensor sensor in sensors)
-                        if (sensor is IHumidity)
-                        {
-                            IHumidity hs = sensor as IHumidity;
-                            if (comparsionString.Equals(">"))
-                            {
-                                if (IsGreaterThanValue(hs.Humidity))
-                                    Console.WriteLine("{0}: {1}%", sensor.Name, hs.Humidity);
-                            }
-                            else
-                            {
-                                if (IsLowerThanValue(hs.Humidity))
-                                    Console.WriteLine("{0}: {1}%", sensor.Name, hs.Humidity);
-                            }
-                        }
-                    break;
-                case "p":
-                    foreach (Sensor sensor in sensors)
-                        if (sensor is IPressure)
-                        {
-                            IPressure ps = sensor as IPressure;
-                            if (comparsionString.Equals(">"))
-                            {
-                                if (IsGreaterThanValue(ps.Pressure))
-                                    Console.WriteLine("{0}: {1} hPa", sensor.Name, ps.Pressure);
-                            }
-                            else
-                            {
-                                if (IsLowerThanValue(ps.Pressure))
-                                    Console.WriteLine("{0}: {1} hPA", sensor.Name, ps.Pressure);
-                            }
-                        }
-                    break;
-            }
-        }
-
-        public void GetAllDataByType(char typeOfSensor)
-        {
-            switch (typeOfSensor)
-            {
-                case 't':
                     foreach (KeyValuePair<string, double> kvp in measurements)
                     {
                         string[] words = kvp.Key.Split(' ');
                         if (words[1].Equals("temperature"))
                         {
-                            Console.WriteLine("{0}: {1} {2}", words[0], kvp.Value, words[2]);
+                            if (comparsionString.Equals(">"))
+                            {
+                                if (IsGreaterThanValue(kvp.Value))
+                                    Console.WriteLine("{0}: {1} {2}", words[0], kvp.Value, words[2]);
+                            }
+                            else
+                            {
+                                if (IsLowerThanValue(kvp.Value))
+                                    Console.WriteLine("{0}: {1} {2}", words[0], kvp.Value, words[2]);
+                            }
                         }
                     }
                     break;
+                case "h":
+                    foreach (KeyValuePair<string, double> kvp in measurements)
+                    {
+                        string[] words = kvp.Key.Split(' ');
+                        if (words[1].Equals("humidity"))
+                        {
+                            if (comparsionString.Equals(">"))
+                            {
+                                if (IsGreaterThanValue(kvp.Value))
+                                    Console.WriteLine("{0}: {1}%", words[0], kvp.Value);
+                            }
+                            else
+                            {
+                                if (IsLowerThanValue(kvp.Value))
+                                    Console.WriteLine("{0}: {1}%", words[0], kvp.Value);
+                            }
+                        }
+                    }
+                    break;
+                case "p":
+                    foreach (KeyValuePair<string, double> kvp in measurements)
+                    {
+                        string[] words = kvp.Key.Split(' ');
+                        if (words[1].Equals("pressure"))
+                        {
+                            if (comparsionString.Equals(">"))
+                            {
+                                if (IsGreaterThanValue(kvp.Value))
+                                    Console.WriteLine("{0}: {1} hPa", words[0], kvp.Value);
+                            }
+                            else
+                            {
+                                if (IsLowerThanValue(kvp.Value))
+                                    Console.WriteLine("{0}: {1} hPa", words[0], kvp.Value);
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+        public void GetAllDataByType(char typeOfSensor)
+        {
+            switch (typeOfSensor)
+            {
                 case 'h':
                     foreach (KeyValuePair<string, double> kvp in measurements)
                     {
@@ -196,6 +192,21 @@ namespace WeatherStationDotnet
                     throw new Exception("Wrong switch case!");
             }
         }
+        public void GetAllDataByType(char TypeOfSensor, char tempUnit)
+        {
+           foreach (KeyValuePair<string, double> kvp in measurements)
+            {
+                string[] words = kvp.Key.Split(' ');
+                if (words[1].Equals("temperature"))
+                {
+                    if(tempUnit==words[2][0])
+                        Console.WriteLine("{0}: {1} {2}", words[0], kvp.Value, words[2]);
+                    else 
+                        if(tempUnit.Equals('F')) Console.WriteLine("{0}: {1} {2}", words[0], kvp.Value* 9 / 5 + 32, 'F');
+                        else Console.WriteLine("{0}: {1} {2}", words[0], (kvp.Value-32) * 5 / 9, 'C');
+                }
+            }
+        }
         private bool CheckIfSensorExists(string name)
         {
             bool exists = false;
@@ -213,50 +224,26 @@ namespace WeatherStationDotnet
             }
             return exists;
         }
-
-    }
-}
-        /* public void SerializeData()
-         {
-             string type;
-             var output = File.OpenWrite("log.json");
+        public void SerializeData()
+        {
+            var output = File.OpenWrite("log"+Name+".json");
 
              while (true)
-             {
-                 if (sensors.Count != 0 && sensors != null)
-                 {
-                     DataContractJsonSerializer dateWriter = new DataContractJsonSerializer(typeof(string));
-                     dateWriter.WriteObject(output, DateTime.Now.ToString("h:mm:ss"));
+              {
+                if (measurements.Count != 0 && measurements != null)
+                {
+                    DataContractJsonSerializer dateWriter = new DataContractJsonSerializer(typeof(string));
+                    dateWriter.WriteObject(output, DateTime.Now.ToString("h:mm:ss"));
 
-                     foreach (Sensor sensor in sensors)
-                     {
-                         type = (sensor.GetType().Name);
-                         switch (type)
-                         {
-                             case "TemperatureAndHumiditySensor":
-                                 TemperatureAndHumiditySensor tempTAH = (TemperatureAndHumiditySensor)sensor;
-                                 tempTAH.Humidity++;
-                                 tempTAH.Temperature++;
-                                 break;
-                             case "TemperatureSensor":
-                                 TemperatureSensor tempT = (TemperatureSensor)sensor;
-                                 tempT.Temperature++;
-                                 break;
-                             case "HumiditySensor":
-                                 HumiditySensor tempH = (HumiditySensor)sensor;
-                                 tempH.Humidity++;
-                                 break;
-                             case "PressureSensor":
-                                 PressureSensor tempP = (PressureSensor)sensor;
-                                 tempP.Pressure++;
-                                 break;
-                         }
-                         DataContractJsonSerializer writer = new DataContractJsonSerializer(sensor.GetType());
-                         writer.WriteObject(output, sensor);
-                     }
-                 }
-                 Thread.Sleep(1000);
-             }
-         }
-     }
-     */
+                    foreach (KeyValuePair<string,double> kvp in measurements)
+                    {
+                        DataContractJsonSerializer writer = new DataContractJsonSerializer(kvp.GetType());
+                        writer.WriteObject(output, kvp);
+                    }
+                }
+                Thread.Sleep(5000);
+            }
+        }
+    }
+   
+}
