@@ -142,9 +142,8 @@ namespace WeatherStationDotnet
             {
                 foreach(Sensor sensor in sensors)
                 {
-                    if(sensor is ITemperature)
+                    if (sensor is ITemperature cSensor)
                     {
-                        ITemperature cSensor = (ITemperature)sensor;
                         cSensor.Unit = unit;
                     }
                 }

@@ -20,7 +20,7 @@ namespace WeatherStationDotnet
             Thread serializerThread = new Thread(SerializeData);
             serializerThread.Start();
         }
-        void eventHandlerPrinter(Measurement measurement)
+        void EventHandlerPrinter(Measurement measurement)
         {
             bool added = false;
             if (active)
@@ -50,7 +50,7 @@ namespace WeatherStationDotnet
                     {
                         sensor = new TemperatureSensor(sensorName);
                         Program.sensors.Add(sensor);
-                        sensor.MeasurementEvent += eventHandlerPrinter;
+                        sensor.MeasurementEvent += EventHandlerPrinter;
                         Console.WriteLine("Dodano czujnik!");
                     }
                     else
@@ -61,7 +61,7 @@ namespace WeatherStationDotnet
                     {
                         sensor = new HumiditySensor(sensorName);
                         Program.sensors.Add(sensor);
-                        sensor.MeasurementEvent += eventHandlerPrinter;
+                        sensor.MeasurementEvent += EventHandlerPrinter;
                         Console.WriteLine("Dodano czujnik!");
                     }
                     else
@@ -72,7 +72,7 @@ namespace WeatherStationDotnet
                     {
                         sensor = new PressureSensor(sensorName);
                         Program.sensors.Add(sensor);
-                        sensor.MeasurementEvent += eventHandlerPrinter;
+                        sensor.MeasurementEvent += EventHandlerPrinter;
                         Console.WriteLine("Dodano czujnik!");
                     }
                     else
@@ -83,7 +83,7 @@ namespace WeatherStationDotnet
                     {
                         sensor = new TemperatureAndHumiditySensor(sensorName);
                         Program.sensors.Add(sensor);
-                        sensor.MeasurementEvent += eventHandlerPrinter;
+                        sensor.MeasurementEvent += EventHandlerPrinter;
                         Console.WriteLine("Dodano czujnik!");
                     }
                     else
@@ -217,7 +217,7 @@ namespace WeatherStationDotnet
                     if (name.Equals(sensor.Name))
                     {
                         Console.WriteLine(sensor.Name);
-                        sensor.MeasurementEvent += eventHandlerPrinter;
+                        sensor.MeasurementEvent += EventHandlerPrinter;
                         exists = true;
                     }
                 }

@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace WeatherStationDotnet
 {
-    [DataContract]
     public class Sensor
     {
         public delegate void MeasurementDelegate(Measurement measurement);
         public event MeasurementDelegate MeasurementEvent;
-        [DataMember]
         public string Name { set; get; }
         public static int instances = 0;
         public Sensor()

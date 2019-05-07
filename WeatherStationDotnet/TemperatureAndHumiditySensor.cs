@@ -4,7 +4,6 @@ using System.Threading;
 
 namespace WeatherStationDotnet
 {
-    [DataContract]
     class TemperatureAndHumiditySensor : Sensor, ITemperature, IHumidity
     {
         [DataMember(Name = "Humidity")]
@@ -37,24 +36,16 @@ namespace WeatherStationDotnet
                 if (unit)
                 {
                     if (rand.Next(2) == 0)
-                    {
                         temperature = rand.Next(55);
-                    }
                     else
-                    {
                         temperature = -rand.Next(55);
-                    }
                 }
                 else
                 {
                     if (rand.Next(2) == 0)
-                    {
                         temperature = Math.Round(rand.Next(55) * 1.8 + 32, 2);
-                    }
                     else
-                    {
                         temperature = Math.Round(-rand.Next(55) * 1.8 + 32, 2);
-                    }
                 }
                 Measurement(Name + " temperature " + Unit, temperature);
             }

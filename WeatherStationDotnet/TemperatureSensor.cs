@@ -4,13 +4,10 @@ using System.Threading;
 
 namespace WeatherStationDotnet
 {
-    [DataContract]
     class TemperatureSensor : Sensor, ITemperature
     {
         bool unit = true;
-        [DataMember(Name ="Temperature")]
         double temperature;
-        [DataMember(Name ="Unit")]
         char unitchar='C';
         Random rand;
         public TemperatureSensor() : base()
