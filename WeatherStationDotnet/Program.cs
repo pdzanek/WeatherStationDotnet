@@ -16,8 +16,8 @@ namespace WeatherStationDotnet
             Console.Clear();
 
             Sensor.instances = 0;
-            WeatherStation weatherStation = new WeatherStation("Weather Station no. 1");
-            WeatherStation weatherStation2 = new WeatherStation("Weather Station no. 2");
+            WeatherStation weatherStation = new WeatherStation("Weather Station no.1");
+            WeatherStation weatherStation2 = new WeatherStation("Weather Station no.2");
             while (true)
             {
                 Console.WriteLine("Wybierz której stacji pogodowej chcesz używać:");
@@ -106,16 +106,18 @@ namespace WeatherStationDotnet
                             Console.WriteLine(Environment.NewLine);
                             break;
                         case "3":
-                            Console.WriteLine("\nWybierz typ czujnika, dla którego chcesz pobrać odczyty:\nt-Temperatura\nh-Wilgoć\np-Ciśnienie");
+                            Console.WriteLine("\nWybierz typ czujnika, dla którego chcesz pobrać odczyty:\n"+
+                                                "t-Temperatura\n"+
+                                                "h-Wilgoć\n"+"" +
+                                                "p-Ciśnienie");
                             sensorType = Console.ReadLine();
                             Console.WriteLine("Wyświetl czujniki:\n" +
-                                "> - wieksze niż\n" +
-                                "< - mniejsze niż\n");
+                                                "> - wieksze niż\n" +
+                                                "< - mniejsze niż\n");
                             comparsionString = Console.ReadLine();
                             comparsionString.ToLower();
                             Console.WriteLine("Wartość:");
                             value = Convert.ToDouble(Console.ReadLine());
-                            Console.WriteLine(sensorType + " " + comparsionString + " " + value + "\n");
                             currentStation.GetSpecifiedData(sensorType, comparsionString, value);
                             break;
                         case "4":

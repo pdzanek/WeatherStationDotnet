@@ -1,13 +1,13 @@
-﻿namespace WeatherStationDotnet
+﻿using System.Collections.Generic;
+
+namespace WeatherStationDotnet
 {
     public class Measurement
     {
+       public KeyValuePair<string, double> kvp;
        public Measurement(string key, double value)
         {
-            Key = key;
-            Value = value;
+             kvp= new KeyValuePair<string, double>(key,value);
         }
-        public string Key { get; set; }
-        public double Value { get; set; }
     }
 }

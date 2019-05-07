@@ -8,18 +8,34 @@ namespace WeatherStationDotnet
     {
         public bool active = false;
         private Sensor sensor;
+        static List<KeyValuePair<string,double>> measurements;
         static List<Sensor> sensors;
         public string Name { get; set; }
         static char unit = 'C';
         public WeatherStation(string WeatherStationName)
         {
             Name = WeatherStationName;
-            sensors = new List<Sensor>();
+            measurements = new List<KeyValuePair<string,double>>();
         }
         void eventHandlerPrinter(Measurement measurement)
         {
-            if(active)
-            Console.WriteLine(Name+" "+measurement.Key + " " + measurement.Value);
+            bool added = false;
+            if (active)
+            {
+                string[] words = measurement.kvp.Key.Split(' ');
+                for(int i=0;i<measurements.Count;i++)
+                {
+                    string[] elem_words = measurements[i].Key.Split(' ');
+                    if (words[0].Equals(elem_words[0]) && words[1].Equals(elem_words[1]))
+                    {
+                        measurements[i] =measurement.kvp;
+                        added = true;
+                    }
+                }
+                //Console.WriteLine("{0}: {1} {2}", Name,measurement.kvp.Key, measurement.kvp.Value);
+                if(!added)
+                measurements.Add(measurement.kvp);
+            }
         }
 
         public void AddSensor(string type, string sensorName)
@@ -81,8 +97,6 @@ namespace WeatherStationDotnet
         internal Func<double, bool> IsGreaterThanValue;
         internal Func<double, bool> IsLowerThanValue;
 
-     
-
         public void GetSpecifiedData(string type, string comparsionString, double value)
         {
             IsGreaterThanValue = x => x > value;
@@ -91,7 +105,7 @@ namespace WeatherStationDotnet
             switch (type)
             {
                 case "t":
-                    foreach (Sensor sensor in sensors)
+                        foreach (Sensor sensor in sensors)
                         if (sensor is ITemperature)
                         {
                             ITemperature ts = sensor as ITemperature;
@@ -149,29 +163,34 @@ namespace WeatherStationDotnet
             switch (typeOfSensor)
             {
                 case 't':
-                    foreach (Sensor sensor in sensors)
-                        if (sensor is ITemperature)
+                    foreach (KeyValuePair<string, double> kvp in measurements)
+                    {
+                        string[] words = kvp.Key.Split(' ');
+                        if (words[1].Equals("temperature"))
                         {
-                            ITemperature ts = sensor as ITemperature;
-                            ts.Unit = unit;
-                            Console.WriteLine("{0}: {1} {2}", sensor.Name, ts.Temperature, ts.Unit);
+                            Console.WriteLine("{0}: {1} {2}", words[0], kvp.Value, words[2]);
                         }
+                    }
                     break;
                 case 'h':
-                    foreach (Sensor sensor in sensors)
-                        if (sensor is IHumidity)
+                    foreach (KeyValuePair<string, double> kvp in measurements)
+                    {
+                        string[] words = kvp.Key.Split(' ');
+                        if (words[1].Equals("humidity"))
                         {
-                            IHumidity hs = sensor as IHumidity;
-                            Console.WriteLine("{0}: {1}%", sensor.Name, hs.Humidity);
+                            Console.WriteLine("{0}: {1}%", kvp.Key, kvp.Value);
                         }
+                    }
                     break;
                 case 'p':
-                    foreach (Sensor sensor in sensors)
-                        if (sensor is IPressure)
+                    foreach(KeyValuePair<string, double> kvp in measurements)
+                    {
+                        string[] words = kvp.Key.Split(' ');
+                        if (words[1].Equals("pressure"))
                         {
-                            IPressure ps = sensor as IPressure;
-                            Console.WriteLine("{0}: {1} hPA", sensor.Name, ps.Pressure);
+                            Console.WriteLine("{0}: {1} hPa", kvp.Key, kvp.Value);
                         }
+                    }
                     break;
                 default:
                     throw new Exception("Wrong switch case!");
