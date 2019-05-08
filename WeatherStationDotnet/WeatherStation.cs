@@ -232,9 +232,6 @@ namespace WeatherStationDotnet
               {
                 if (measurements.Count != 0 && measurements != null)
                 {
-                    DataContractJsonSerializer dateWriter = new DataContractJsonSerializer(typeof(string));
-                    dateWriter.WriteObject(output, DateTime.Now.ToString("h:mm:ss"));
-
                     foreach (KeyValuePair<string,double> kvp in measurements)
                     {
                         DataContractJsonSerializer writer = new DataContractJsonSerializer(kvp.GetType());
